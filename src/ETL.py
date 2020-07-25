@@ -10,14 +10,13 @@ import json
 import logging
 import re
 import time
-import logging
 
 from sql_queries import *
+from config import get_config
 
 logging.basicConfig(level=logging.INFO)
 
-# URL for all laptops on B&H website
-theurl = 'https://www.bhphotovideo.com/c/buy/laptops/ci/18818/N/4110474292/pn/'
+config = get_config()
 
 def get_page_info(soup):
     """
@@ -166,7 +165,7 @@ def iter_laptop_from_site():
     product_info - a dictionary contains all necessary info for one product  
     """
     # B&H laptop URL
-    url = 'https://www.bhphotovideo.com/c/buy/laptops/ci/18818/N/4110474292/pn/'
+    url = config.get('SCRAPE', 'URL')
     # scrape from the first page
     page = 1
     
@@ -177,8 +176,8 @@ def iter_laptop_from_site():
             thepage = urlopen(req).read()
             page_soup = BeautifulSoup(thepage, 'html.parser')
         except Exception as e:
-            logging.info(f"ERROR ocurred when scraping data for page {page}.")
-            logging.info(f"ERROR message: {e}")
+            logging.info("ERROR ocurred when scraping data for page {}.".format(page))
+            logging.info("ERROR message: {}".format(e))
             break
             
         # if last page is reached, exit
@@ -230,7 +229,7 @@ def process_data(cur, conn):
         print("Successfully inserted scrapted data into laptop table")
 
         # extract data from ticker_csv and insert into brand table
-        df_ticker = pd.read_csv('../data/brand_ticker_info.csv')
+        df_ticker = pd.read_csv('/Users/margaret/OneDrive/Documents/Twitter/Scraping_Laptop/data/brand_ticker_info.csv')
         df_ticker = df_ticker.rename(columns={'brand':'name'})
         psycopg2.extras.execute_batch(cur, brand_table_insert, df_ticker.to_dict(orient='records'))
         conn.commit()

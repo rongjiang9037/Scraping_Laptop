@@ -1,3 +1,11 @@
+# drop database
+bnhlaptop_db_drop = """DROP DATABASE IF EXISTS bnhlaptop"""
+
+# create database
+bnhlaptop_db_create = """CREATE DATABASE bnhlaptop 
+                            WITH ENCODING 'utf8'
+                            TEMPLATE template0"""
+
 # drop tables
 laptop_table_drop = """DROP TABLE IF EXISTS dimlaptop"""
 

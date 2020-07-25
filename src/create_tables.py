@@ -2,8 +2,11 @@ import logging
 
 import psycopg2
 from sql_queries import * 
+from config import get_config
 
 logging.basicConfig(level=logging.INFO)
+
+config = get_config()
 
 def create_database():
     """
@@ -13,33 +16,36 @@ def create_database():
     input: None
     return: None
     """
-    # connect to default database
-    conn = psycopg2.connect(host='localhost',
-                            dbname='postgres', 
-                            password='test' ,
-                            port=5432, 
-                            user='postgres')
-    conn.set_session(autocommit=True)
-    # get cursor variable 
-    cur = conn.cursor()
-    # drop database bnhlaptop if exists
-    cur.execute("DROP DATABASE IF EXISTS bnhlaptop")
-    # create new database bnhlapopt
-    cur.execute("""CREATE DATABASE bnhlaptop 
-                            WITH ENCODING 'utf8'
-                            TEMPLATE template0""")
-    # close database connection
-    conn.close()
+    try:
+        # connect to default database
+        conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['DB_DEFAULT'].values()))
+        conn.set_session(autocommit=True)
+
+        # get cursor variable 
+        cur = conn.cursor()
+
+        # drop database bnhlaptop if exists
+        cur.execute(bnhlaptop_db_drop)
+
+        # create new database bnhlapopt
+        cur.execute(bnhlaptop_db_create)
+
+        # close database connection
+        conn.close()
+    except Exception as e:
+        logging.info("Error occurred when creating/dropping database bnhlaptop.")
+        print(e)
     
     logging.info("Created new database bnhlaptop.")
     
-    # connect to new database
-    conn = psycopg2.connect(host='localhost', 
-                            dbname='bnhlaptop', 
-                            password='test', 
-                            port=5432, 
-                            user='postgres'")
-    cur = conn.cursor()
+    try:
+        # connect to new database
+        conn = psycopg2.connect("host={} dbname={} user={} password={} port={}".format(*config['DB'].values()))
+        cur = conn.cursor()
+    except Exception as e:
+        logging.info("Error occurred when connecting to new database.")
+        print(e)
+        
     return cur, conn
 
 
@@ -53,11 +59,15 @@ def drop_tables(cur, conn):
     
     return: None
     """
-    # loop drop_table_queries
-    for query in drop_table_queries:
-        cur.execute(query)
-        conn.commit()
-        
+    try:
+        # loop drop_table_queries
+        for query in drop_table_queries:
+            cur.execute(query)
+            conn.commit()
+    except Exception as e:
+        logging.info("Error occurred dropping related tables.")
+        print(e)
+
     logging.info('Dropped all tables in database bnhcomputer.')
     
     
@@ -71,10 +81,14 @@ def create_tables(cur, conn):
     
     return: None
     """
-    # loop over create_table_queries list
-    for query in create_table_queries:
-        cur.execute(query)
-        conn.commit()
+    try:
+        # loop over create_table_queries list
+        for query in create_table_queries:
+            cur.execute(query)
+            conn.commit()
+    except Exception as e:
+        logging.info("Error occurred creating related tables.")
+        print(e)
     
     logging.info('Created new tables in database bnhcomputer.')
     
