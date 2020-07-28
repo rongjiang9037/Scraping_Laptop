@@ -72,6 +72,8 @@ def extract_availibility_info(info_str):
     info_str = info_str.lower()
     if 'in stock' in info_str:
         return 'in stock'
+    elif 'special order' in info_str:
+        return 'special order'
     elif 'back-ordered' in info_str:
         return 'back-ordered'
     elif 'new item' in info_str:
@@ -227,7 +229,10 @@ def process_data(cur, conn):
         # extract data from staging table and insert into dimlaptop table
         cur.execute(laptop_table_insert)
         print("Successfully inserted scrapted data into laptop table")
-
+        
+        # extract brand data from staging table and insert into dimlaptop table
+        cur.execute(brand_table_insert_from_staging)
+        
         # extract data from ticker_csv and insert into brand table
         df_ticker = pd.read_csv('/Users/margaret/OneDrive/Documents/Twitter/Scraping_Laptop/data/brand_ticker_info.csv')
         df_ticker = df_ticker.rename(columns={'brand':'name'})

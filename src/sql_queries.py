@@ -85,6 +85,12 @@ brand_table_insert = """INSERT INTO dimbrand (name, ticker, exchange_nm)
                             DO UPDATE SET ticker = excluded.ticker,
                                           exchange_nm = excluded.exchange_nm;
 """
+brand_table_insert_from_staging = """INSERT INTO dimbrand (name, ticker, exchange_nm)
+                                        SELECT DISTINCT brand, null, null
+                                            FROM staging_laptop
+                                    ON CONFLICT 
+                                    DO NOTHING
+"""
 
 time_table_insert = """INSERT INTO dimtime (time, day, week, month, year, weekday)
                             VALUES (%s, %s, %s, %s, %s, %s)
