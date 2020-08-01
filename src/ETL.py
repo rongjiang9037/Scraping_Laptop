@@ -234,7 +234,7 @@ def process_data(cur, conn):
         cur.execute(brand_table_insert_from_staging)
         
         # extract data from ticker_csv and insert into brand table
-        df_ticker = pd.read_csv('/Users/margaret/OneDrive/Documents/Twitter/Scraping_Laptop/data/brand_ticker_info.csv')
+        df_ticker = pd.read_csv('/Users/margaret/OneDrive/Documents/projects/Scraping_Laptop/data/brand_ticker_info.csv')
         df_ticker = df_ticker.rename(columns={'brand':'name'})
         psycopg2.extras.execute_batch(cur, brand_table_insert, df_ticker.to_dict(orient='records'))
         conn.commit()
@@ -266,11 +266,11 @@ def process_data(cur, conn):
     
 def main():
     """
-    - Connect to sparkifydb database
+    - Connect to postgresql database
     
     - get cursor variable
     
-    - process data stored in file path 'data/song_data' & 'data/log_data'
+    - extract, transform and load data from B&H site
     
     - close database connection
     
