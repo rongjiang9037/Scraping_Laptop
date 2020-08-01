@@ -14,6 +14,9 @@ This project scrapes [B&H Laptops'](https://www.bhphotovideo.com/c/buy/laptops/c
 ### ETL
 The python library urllib.request and BeautifulSoup are used to scrape web data.
 
+### Workflow
+![Image of Workflow](https://www.dropbox.com/s/poagkbp0o54aejg/laptop_workflow.png?raw=1)
+
 ## Files
 * conda-requirements.yml
     * Anaconda yaml file to create environment for correct python environment
