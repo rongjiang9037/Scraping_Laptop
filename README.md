@@ -18,8 +18,11 @@ The python library urllib.request and BeautifulSoup are used to scrape web data.
 ![Image of Workflow](https://www.dropbox.com/s/poagkbp0o54aejg/laptop_workflow.png?raw=1)
 
 ## Files
-* conda-requirements.yml
-    * Anaconda yaml file to create environment for correct python environment
+* analysis
+    * trend_analysis.ipynb
+        * Analyze trend for number of laptop, average price at B&H.
+    * snapshot_analysis.ipynb
+        * Analyze market share of B&H products with the latest available data.
 * src
     * sql_queries.py
         * All SQL quries used for ETL are stored here
@@ -32,6 +35,9 @@ The python library urllib.request and BeautifulSoup are used to scrape web data.
         * Jupyter Notebook used to develop ETL.
     * create_table.ipynb
         * Jupyter Notebook used to test data creating process.
+* data
+    * brand_ticker_info.csv
+        * This is a csv file contains laptop brand, ticker name and exchanged listed on if it's a public company.
         
 
 ## ER Diagram
