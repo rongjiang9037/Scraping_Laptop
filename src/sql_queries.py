@@ -15,7 +15,7 @@ time_table_drop = """DROP TABLE IF EXISTS dimtime"""
 
 laptopinfo_table_drop = """DROP TABLE IF EXISTS factlaptopinfo"""
 
-staging_table_delete = """DROP TABLE IF EXISTS staging_laptop;"""
+staging_table_delete = """DROP TABLE IF EXISTS staging_laptop2;"""
 
 # create tables
 laptop_table_create = """CREATE TABLE IF NOT EXISTS dimlaptop
@@ -49,18 +49,22 @@ laptopinfo_table_create = """CREATE TABLE IF NOT EXISTS factlaptopinfo
                                     laptop_key integer REFERENCES dimlaptop(laptop_key),
                                     brand_key integer REFERENCES dimbrand(brand_key),
                                     price numeric,
+                                    reg_price numeric,
+                                    money_saved numeric,
                                     availability varchar,
                                     review_num integer
                                 )
                     """
 
-staging_table_create = """CREATE TABLE IF NOT EXISTS staging_laptop
+staging_table_create = """CREATE TABLE IF NOT EXISTS staging_laptop2
                                 (   ID SERIAL PRIMARY KEY,
                                     time date NOT NULL,
                                     name varchar NOT NULL,
                                     brand varchar NOT NULL,
                                     sku varchar NOT NULL,
                                     price numeric,
+                                    reg_price numeric,
+                                    money_saved numeric,
                                     url varchar NOT NULL,
                                     availability varchar,
                                     review_num integer,
@@ -71,7 +75,7 @@ staging_table_create = """CREATE TABLE IF NOT EXISTS staging_laptop
 # insert tables
 laptop_table_insert = """INSERT INTO dimlaptop (name, sku, url)
                             SELECT name, sku, url
-                            FROM staging_laptop
+                            FROM staging_laptop2
                             ON CONFLICT (sku)
                             DO UPDATE SET name = excluded.name,
                                           url = excluded.url;
@@ -87,7 +91,7 @@ brand_table_insert = """INSERT INTO dimbrand (name, ticker, exchange_nm)
 """
 brand_table_insert_from_staging = """INSERT INTO dimbrand (name, ticker, exchange_nm)
                                         SELECT DISTINCT brand, null, null
-                                            FROM staging_laptop
+                                            FROM staging_laptop2
                                     ON CONFLICT 
                                     DO NOTHING
 """
@@ -98,25 +102,29 @@ time_table_insert = """INSERT INTO dimtime (time, day, week, month, year, weekda
                        DO NOTHING
                     """
 
-laptopinfo_table_insert = """INSERT INTO factlaptopinfo (time, laptop_key, brand_key, price, availability, review_num)
+laptopinfo_table_insert = """INSERT INTO factlaptopinfo (time, laptop_key, brand_key, price, reg_price, money_saved, availability, review_num)
                                 SELECT %(time)s, 
                                        laptop.laptop_key, 
                                        brand.brand_key,
                                        staging.price,
+                                       staging.reg_price,
+                                       staging.money_saved,
                                        staging.availability,
                                        staging.review_num
-                                FROM staging_laptop staging
+                                FROM staging_laptop2 staging
                                 JOIN dimlaptop laptop ON (staging.sku = laptop.sku)
                                 JOIN dimbrand brand ON (staging.brand = brand.name);
 """
 
 
-staging_table_insert = """INSERT INTO staging_laptop (name, time, brand, sku, price, url, availability, review_num)
+staging_table_insert = """INSERT INTO staging_laptop2 (name, time, brand, sku, price, reg_price, money_saved, url, availability, review_num)
                                 VALUES ( %(name)s,
                                          %(time)s,
                                          %(brand)s,
                                          %(sku)s,
                                          %(price)s,
+                                         %(reg_price)s,
+                                         %(money_saved)s,
                                          %(url)s,
                                          %(availability)s,
                                          %(review_num)s
@@ -127,6 +135,8 @@ staging_table_insert = """INSERT INTO staging_laptop (name, time, brand, sku, pr
                                               brand = excluded.brand,
                                               sku = excluded.sku,
                                               price = excluded.price,
+                                              reg_price = excluded.reg_price,
+                                              money_saved = excluded.money_saved,
                                               url = excluded.url,
                                               availability = excluded.availability,
                                               review_num = excluded.review_num;
